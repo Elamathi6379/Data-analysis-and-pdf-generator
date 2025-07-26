@@ -1,0 +1,51 @@
+import pandas as pd
+from fpdf import FPDF
+import os
+
+# Load CSV
+df = pd.read_csv("data.csv")
+df["Score"] = pd.to_numeric(df["Score"], errors="coerce")
+
+#Data Stats
+avg_score = df["Score"].mean()
+max_score = df["Score"].max()
+min_score = df["Score"].min()
+
+# PDF setup
+pdf = FPDF()
+pdf.add_page()
+
+# Title
+pdf.set_font("Arial", "B", 16)
+pdf.cell(0, 10, "Student Score Report", ln=True, align="C")
+pdf.ln(10)
+
+# Table header
+pdf.set_font("Arial", "B", 12)
+pdf.set_fill_color(200, 220, 255)
+pdf.cell(100, 10, "Name", border=1, align="C")
+pdf.cell(40, 10, "Score", border=1, align="C")
+pdf.ln()
+
+# Table rows
+pdf.set_font("Arial", "", 12)
+for index, row in df.iterrows():
+    name = str(row["Name"])
+    score = str(int(row["Score"]))
+    pdf.cell(100, 10, str(row["Name"]), border=1)
+    pdf.cell(40, 10, str(int(row["Score"])), border=1, align="C")
+    pdf.ln()
+
+# Summary
+pdf.ln(8)
+pdf.set_font("Arial", "B", 12)
+pdf.cell(0, 10, "Summary", ln=True)
+pdf.set_font("Arial", "", 12)
+pdf.cell(0, 10, f"Average Score: {avg_score:.2f}", ln=True)
+pdf.cell(0, 10, f"Highest Score: {max_score}", ln=True)
+pdf.cell(0, 10, f"Lowest Score: {min_score}", ln=True)
+
+# Save PDF
+pdf.output("report.pdf")
+print(" PDF generated successfully!")
+print("File saved at:", os.path.abspath("report.pdf"))
